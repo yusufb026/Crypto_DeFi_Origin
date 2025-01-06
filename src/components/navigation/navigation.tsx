@@ -1,8 +1,9 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import Box from "@mui/material/Box";
 import { navigations } from "./navigation.data";
-import { Link } from "@mui/material";
+import { Link, Tooltip } from "@mui/material";
 import { useLocation } from "react-router-dom";
+import { useSDK } from "@metamask/sdk-react";
 
 type NavigationData = {
   path: string;
@@ -13,16 +14,28 @@ const Navigation: FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
 
+  const [account, setAccount] = useState<string>();
+  const { sdk, connected, connecting, provider, chainId } = useSDK();
+
+  const connect = async () => {
+    try {
+      const accounts = await sdk?.connect();
+      setAccount(accounts?.[0]);
+    } catch (err) {
+      console.warn("failed to connect..", err);
+    }
+  };
+
   return (
     <Box
       sx={{
         display: "flex",
         flexFlow: "wrap",
         justifyContent: "end",
-        flexDirection: { xs: "column", lg: "row" }
+        flexDirection: { xs: "column", lg: "row" },
       }}
     >
-      {navigations.map(({ path: destination, label }: NavigationData) =>
+      {navigations.map(({ path: destination, label }: NavigationData) => (
         <Box
           key={label}
           component={Link}
@@ -42,12 +55,12 @@ const Navigation: FC = () => {
             px: { xs: 0, lg: 3 },
             mb: { xs: 3, lg: 0 },
             fontSize: "20px",
-            ...destination === "/" && { color: "primary.main" },
+            ...(destination === "/" && { color: "primary.main" }),
             "& > div": { display: "none" },
             "&.current>div": { display: "block" },
             "&:hover": {
-              color: "text.disabled"
-            }
+              color: "text.disabled",
+            },
           }}
         >
           <Box
@@ -55,7 +68,7 @@ const Navigation: FC = () => {
               position: "absolute",
               top: 12,
               transform: "rotate(3deg)",
-              "& img": { width: 44, height: "auto" }
+              "& img": { width: 44, height: "auto" },
             }}
           >
             {/* eslint-disable-next-line */}
@@ -63,30 +76,67 @@ const Navigation: FC = () => {
           </Box>
           {label}
         </Box>
+      ))}
+
+      {connected ? (
+        <Tooltip
+          title={
+            <div>
+              <p>{account && `Connected account: ${account}`}</p>
+              <p>{chainId && `Connected chain id: ${chainId}`}</p>
+            </div>
+          }
+        >
+          <Box
+            sx={{
+              position: "relative",
+              color: "white",
+              cursor: "pointer",
+              textDecoration: "none",
+              textTransform: "uppercase",
+              fontWeight: 600,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              px: { xs: 0, lg: 3 },
+              mb: { xs: 3, lg: 0 },
+              fontSize: "24px",
+              lineHeight: "6px",
+              width: "324px",
+              height: "45px",
+              borderRadius: "6px",
+              backgroundColor: "#00dbe3",
+            }}
+          >
+            Connected
+          </Box>
+        </Tooltip>
+      ) : (
+        <Box
+          onClick={connect}
+          sx={{
+            position: "relative",
+            color: "white",
+            cursor: "pointer",
+            textDecoration: "none",
+            textTransform: "uppercase",
+            fontWeight: 600,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            px: { xs: 0, lg: 3 },
+            mb: { xs: 3, lg: 0 },
+            fontSize: "24px",
+            lineHeight: "6px",
+            width: "324px",
+            height: "45px",
+            borderRadius: "6px",
+            backgroundColor: "#00dbe3",
+          }}
+        >
+          Connect Wallet
+        </Box>
       )}
-      <Box
-        sx={{
-          position: "relative",
-          color: "white",
-          cursor: "pointer",
-          textDecoration: "none",
-          textTransform: "uppercase",
-          fontWeight: 600,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          px: { xs: 0, lg: 3 },
-          mb: { xs: 3, lg: 0 },
-          fontSize: "24px",
-          lineHeight: "6px",
-          width: "324px",
-          height: "45px",
-          borderRadius: "6px",
-          backgroundColor: "#00dbe3"
-        }}
-      >
-        Connect Wallet
-      </Box>
     </Box>
   );
 };
