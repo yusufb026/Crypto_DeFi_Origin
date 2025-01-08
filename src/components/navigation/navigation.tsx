@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import { navigations } from "./navigation.data";
 import { Link, Tooltip } from "@mui/material";
@@ -49,6 +49,7 @@ const currencies = [
 ];
 
 const Navigation: FC = () => {
+  const ref = useRef<HTMLSelectElement | null>(null);
   const location = useLocation();
   const currentPath = location.pathname;
   const dispatch = useAppDispatch();
@@ -72,6 +73,27 @@ const Navigation: FC = () => {
   const handleCurrencyChange = (event: any) => {
     setCurrency(event.target.value);
     fetchAccordingToCurrency();
+    getWidth();
+  };
+
+  const getWidth = () => {
+    if (ref.current) {
+      const span = document.createElement("span");
+      span.style.position = "absolute";
+      span.style.visibility = "hidden";
+      span.style.whiteSpace = "nowrap";
+      span.style.fontSize = "12px";
+      const text = currencies.filter(
+        (item) =>
+          ref.current && item.code === ref.current.selectedOptions[0].value
+      )[0];
+      span.textContent = `${text?.symbol} ${text?.code}`;
+      document.body.appendChild(span);
+      const width = span.getBoundingClientRect().width;
+      ref.current.style.width = `${width}px`;
+      document.body.removeChild(span);
+      return width;
+    }
   };
 
   return (
@@ -157,8 +179,9 @@ const Navigation: FC = () => {
             Connected
             <div style={{ fontSize: 12, paddingTop: 2 }}>
               {" "}
-              {String(getFormattedBalance(accountBalance))} ETH ( {fiatBalance}{" "}
+              {String(getFormattedBalance(accountBalance))} ETH ({fiatBalance}{" "}
               <select
+                ref={ref}
                 value={currency}
                 onChange={handleCurrencyChange}
                 style={{
@@ -173,9 +196,7 @@ const Navigation: FC = () => {
                 {currencies.map((currencyOption) => (
                   <option key={currencyOption.code} value={currencyOption.code}>
                     {currencyOption.symbol}{" "}
-                    {currencyOption.code === currency &&
-                      currencyOption.symbol.length < 3 &&
-                      currencyOption.code}{" "}
+                    {currencyOption.code === currency && currencyOption.code}{" "}
                     {currencyOption.code !== currency && currencyOption.name}
                   </option>
                 ))}
