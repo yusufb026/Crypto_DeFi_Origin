@@ -7,6 +7,7 @@ const initialState = {
   chainId: null as bigint | null,
   isLoading: false,
   error: null,
+  accountBalance: null as bigint | null,
 };
 
 const metaMaskSlice = createSlice({
@@ -22,6 +23,7 @@ const metaMaskSlice = createSlice({
         state.isLoading = false;
         state.account = action.payload.account;
         state.chainId = action.payload.chainId;
+        state.accountBalance = action.payload.accountBalance;
       })
       .addCase(connectToMetaMask.rejected, (state, action) => {
         state.isLoading = false;
