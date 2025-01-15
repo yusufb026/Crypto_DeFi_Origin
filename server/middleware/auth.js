@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const getPassport = require('../config/getPassport')
+const getPassport = require('../config/getPassport');
 
 const auth = (() => {
   getPassport();
@@ -16,7 +16,7 @@ module.exports = function (req, res, next) {
 
   // Verify token
   try {
-    jwt.verify(token, "hello", (error, decoded) => {
+    jwt.verify(token, 'hello', (error, decoded) => {
       if (error) {
         return res.status(401).json({ msg: 'Token is not valid' });
       } else {
