@@ -6,16 +6,27 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import { BrowserRouter } from "react-router-dom";
-
+import { MetaMaskProvider } from "@metamask/sdk-react";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <MetaMaskProvider
+        sdkOptions={{
+          dappMetadata: {
+            name: "Example React Dapp",
+            url: window.location.href,
+          },
+          infuraAPIKey: process.env.REACT_APP_INFURA_API_KEY,
+          // Other options.
+        }}
+      >
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </MetaMaskProvider>
     </Provider>
   </React.StrictMode>
 );
