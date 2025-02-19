@@ -1,4 +1,4 @@
-const domain = 'http://blastapi.org';
+const domain = 'http://quicknode-api.com';
 const subdomain = 'api/service/token';
 const id = '6d4c9a304e2e38cfb907e27f12a07b9c';
 
